@@ -49,12 +49,17 @@ class LongPolling extends Command
 
       echo date('Y-m-d H:i:s') . ' - Running Services ...' . PHP_EOL;
       while (true) {
-        $update = $telegram->commandsHandler(false, ['timeout' => 30]);
-        // $update = Telegram::getUpdate();
-        // print_r($update);
-        // if ($update > 0) {
-        //   echo date('Y-m-d H:i:s') . ' - Processed ' . $update_count . ' updates' . PHP_EOL;
-        // }
+        $update = $telegram->commandsHandler(false);
+
+        if (!empty($update)) {
+          $string = $update[0]->getMessage()->getText();
+          if (!strpos($string, "/", 1)) {
+            $telegram->sendMessage([
+              'chat_id' => $update[0]->getMessage()->getChat()->getId(),
+              'text' => 'You search \'' . $string . '\' '
+            ]);
+          }
+        }
       }
     }
 }
